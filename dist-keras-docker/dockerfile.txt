@@ -1,0 +1,74 @@
+FROM centos:latest
+MAINTAINER CVUSK
+
+# yum install packages
+RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+RUN yum -y groupinstall "Development Tools"
+RUN yum -y install epel-release && \
+    yum -y install python-devel python-pip python-dev python-virtualenv && \
+    yum install -y wget bzip2 java-1.8.0-openjdk java-1.8.0-openjdk-devel tar unzip
+RUN yum -y update
+RUN yum clean all
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0
+
+
+# pip install python libraries
+RUN pip install --upgrade pip
+RUN pip install pandas scipy jupyter tensorflow keras && \
+    pip install scikit-learn matplotlib Pillow && \
+    pip install graphviz requests py4j seaborn
+
+
+# generate jupyter notebook config
+# BE SURE to change NotebookApp.token variable to your password
+RUN jupyter notebook --generate-config && \
+    ipython profile create
+RUN echo "c.NotebookApp.ip = '*'" >>/root/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.open_browser = False" >>/root/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.token = 'jupyter'" >>/root/.jupyter/jupyter_notebook_config.py && \
+    echo "c.InteractiveShellApp.matplotlib = 'inline'" >>/root/.ipython/profile_default/ipython_config.py  
+
+# env variables
+ENV SPARK_PROFILE 2.1.0
+ENV SPARK_VERSION 2.1.0
+ENV HADOOP_PROFILE 2.7
+ENV HADOOP_VERSION 2.7.0
+
+# install spark on /opt/
+WORKDIR /opt/
+RUN curl -sL http://d3kbcqa49mib13.cloudfront.net/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_PROFILE}.tgz | tar zxv
+RUN ln -s /opt/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_PROFILE} /opt/spark
+
+# env variables
+ENV PATH=${SPARK_HOME}/bin:${SPARK_HOME}/sbin:${PATH}
+ENV PYTHONPATH="$SPARK_HOME/python/:$SPARK_HOME/python/lib/py4j-0.9-src.zip:/opt/dist-keras/distkeras:$PYTHONPATH"
+
+ENV SPARK_HOME /opt/spark
+ENV SPARK_MASTER_OPTS="-Dspark.driver.port=7001 -Dspark.fileserver.port=7002 -Dspark.broadcast.port=7003 -Dspark.replClassServer.port=7004 -Dspark.blockManager.port=7005 -Dspark.executor.port=7006 -Dspark.ui.port=4040 -Dspark.broadcast.factory=org.apache.spark.broadcast.HttpBroadcastFactory"
+ENV SPARK_WORKER_OPTS="-Dspark.driver.port=7001 -Dspark.fileserver.port=7002 -Dspark.broadcast.port=7003 -Dspark.replClassServer.port=7004 -Dspark.blockManager.port=7005 -Dspark.executor.port=7006 -Dspark.ui.port=4040 -Dspark.broadcast.factory=org.apache.spark.broadcast.HttpBroadcastFactory"
+
+ENV SPARK_MASTER_PORT 7077
+ENV SPARK_MASTER_WEBUI_PORT 8080
+ENV SPARK_WORKER_WEBUI_PORT 8081
+
+# install dist-keras
+WORKDIR /opt/
+RUN yum -y install git
+RUN git clone https://github.com/JoeriHermans/dist-keras
+WORKDIR dist-keras
+RUN pip install -e .
+
+# unzip mnist data
+WORKDIR /opt/dist-keras/examples/data
+RUN unzip mnist.zip
+
+
+EXPOSE 8080 7077 8888 8081 4040 7001 7002 7003 7004 7005 7006
+
+
+# add spark master and slave start shell
+WORKDIR /opt/
+ADD spark_run.sh /opt/spark_run.sh
+
+
+
