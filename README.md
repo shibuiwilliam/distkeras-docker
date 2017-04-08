@@ -91,4 +91,79 @@ Now you are ready run mnist.py.
 python mnist.py
 ```
 
+Here's the log for running on 3 Spark workers cluster:
 
+```
+Using TensorFlow backend.
+Ivy Default Cache set to: /root/.ivy2/cache
+The jars for the packages stored in: /root/.ivy2/jars
+:: loading settings :: url = jar:file:/opt/spark-2.1.0-bin-hadoop2.7/jars/ivy-2.4.0.jar!/org/apache/ivy/core/settings/ivysettings.xml
+com.databricks#spark-csv_2.10 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent;1.0
+        confs: [default]
+        found com.databricks#spark-csv_2.10;1.4.0 in central
+        found org.apache.commons#commons-csv;1.1 in central
+        found com.univocity#univocity-parsers;1.5.1 in central
+:: resolution report :: resolve 287ms :: artifacts dl 6ms
+        :: modules in use:
+        com.databricks#spark-csv_2.10;1.4.0 from central in [default]
+        com.univocity#univocity-parsers;1.5.1 from central in [default]
+        org.apache.commons#commons-csv;1.1 from central in [default]
+        ---------------------------------------------------------------------
+        |                  |            modules            ||   artifacts   |
+        |       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+        ---------------------------------------------------------------------
+        |      default     |   3   |   0   |   0   |   0   ||   3   |   0   |
+        ---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent
+        confs: [default]
+        0 artifacts copied, 3 already retrieved (0kB/10ms)
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+17/04/08 11:26:59 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+cp_mnist.py:154: UserWarning: Update your `Conv2D` call to the Keras 2 API: `Conv2D(32, (3, 3), padding="valid", input_shape=(28, 28, 1...)`
+  input_shape=input_shape))
+cp_mnist.py:156: UserWarning: Update your `Conv2D` call to the Keras 2 API: `Conv2D(32, (3, 3))`
+  convnet.add(Convolution2D(nb_filters, kernel_size[0], kernel_size[1]))
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE3 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+Number of desired executors: 3
+Number of desired processes / executor: 1
+Total number of workers: 3
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+conv2d_1 (Conv2D)            (None, 26, 26, 32)        320
+_________________________________________________________________
+activation_1 (Activation)    (None, 26, 26, 32)        0
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 24, 24, 32)        9248
+_________________________________________________________________
+activation_2 (Activation)    (None, 24, 24, 32)        0
+_________________________________________________________________
+max_pooling2d_1 (MaxPooling2 (None, 12, 12, 32)        0
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 4608)              0
+_________________________________________________________________
+dense_1 (Dense)              (None, 225)               1037025
+_________________________________________________________________
+activation_3 (Activation)    (None, 225)               0
+_________________________________________________________________
+dense_2 (Dense)              (None, 10)                2260
+_________________________________________________________________
+activation_4 (Activation)    (None, 10)                0
+=================================================================
+Total params: 1,048,853.0
+Trainable params: 1,048,853.0
+Non-trainable params: 0.0
+_________________________________________________________________
+60000
+Training time: 1497.86584091
+Accuracy: 0.9897
+Number of parameter server updates: 3751
+```
