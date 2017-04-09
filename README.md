@@ -40,15 +40,17 @@ docker run -it --link spmaster:master -p 38080:8080 -p 37077:7077 -p 38888:8888 
 -p 37002:7002 -p 37003:7003 -p 37004:7004 -p 37005:7005 -p 37006:7006 --name spslave2 -h spslave2 distkeras /bin/bash
 ```
 
-On each container, run shellscripts to start Spark cluster.
+On each container, run shellscripts, added during docker build, to start Spark cluster.
 
 ```
 # for Spark master
 # Spark master and worker start
+cd /opt/
 sh spark_master.sh
 
 # for Spark worker
 # Spark worker starts and added to Spark cluster
+cd /opt/
 sh spark_slave.sh
 ```
 
@@ -75,7 +77,7 @@ path_test = "data/mnist_test.csv"
 if local:
     # Tell master to use local resources.
 #     master = "local[*]"   comment out
-    master = "spark://spm:7077"  # add
+    master = "spark://spmaster:7077"  # add
     num_processes = 1
     num_executors = 3  # changed 1 to 3
 else:
