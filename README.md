@@ -169,3 +169,74 @@ Training time: 1497.86584091
 Accuracy: 0.9897
 Number of parameter server updates: 3751
 ```
+
+
+## running on multi-host docker container
+In order to run the training in better performance, it is highly recommended to run docker on multi-host.
+I used overlay network to build multi-host docker, and this is how.
+#### for more about multi-host docker, take a look at this documentation
+https://docs.docker.com/engine/userguide/networking/get-started-overlay/
+
+I deployed two host servers: host1 and host2.
+On host1, install and start etcd for key-value store.
+
+```
+yum -y install etcd
+
+vi /etc/etcd/etcd.conf
+systemctl enable etcd
+systemctl start etcd
+```
+
+Next, edit docker network config on host1 and host2.
+
+```
+# edit docker-network file
+vi /etc/sysconfig/docker-network
+
+# for host1
+DOCKER_NETWORK_OPTIONS='--cluster-store=etcd://<host1>:2379 --cluster-advertise=<host1>:2376'
+
+# for host2
+DOCKER_NETWORK_OPTIONS='--cluster-store=etcd://<host1>:2379 --cluster-advertise=<host2>:2376'
+
+# from host2 to ensure network connection to host1 etcd is available
+curl -L http://<host1>:2379/version
+{"etcdserver":"3.1.3","etcdcluster":"3.1.0"}
+
+```
+
+Now you are ready to connect docker on multi-host.
+Create docker network on host1.
+Here I created test1 network with subnet 10.0.1.0/24
+
+```
+# for host1
+docker network create --subnet=10.0.1.0/24 -d overlay test1
+```
+
+Run `docker network ls` to see test1 network is added to docker network.
+
+```
+NETWORK ID          NAME                DRIVER              SCOPE
+feb90a5a5901        bridge              bridge              local
+de3c98c59ba6        docker_gwbridge     bridge              local
+d7bd500d1822        host                host                local
+d09ac0b6fed4        none                null                local
+9d4c66170ea0        test1               overlay             global
+```
+
+Then add docker containers on test1 network.
+
+```
+# for host1 as spark master
+docker run -it --net=test1 --ip=10.0.1.10 -p 18080:8080 -p 17077:7077 -p 18888:8888 -p 18081:8081 -p 14040:4040 -p 17001:7001 -p 17002:7002 \
+-p 17003:7003 -p 17004:7004 -p 17005:7005 -p 17006:7006 --name spm -h spm distkeras /bin/bash
+
+# for host2 as spark slave
+docker run -it --net=test1 --ip=10.0.1.20 --link=spm:master -p 28080:8080 -p 27077:7077 -p 28888:8888 -p 28081:8081 -p 24040:4040 -p 27001:7001 \
+-p 27002:7002 -p 27003:7003 -p 27004:7004 -p 27005:7005 -p 27006:7006 --name sps1 -h sps1 distkeras /bin/bash
+```
+
+Now the docker containers are running on host1 and host2 with connection to test1 network.
+You are now ready to run mnist.py as did in the previous section.
