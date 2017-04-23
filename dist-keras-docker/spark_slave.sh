@@ -7,3 +7,5 @@ ${SPARK_HOME}/sbin/start-slave.sh -c 1 -m 3G ${MASTER}
 
 export PYSPARK_SUBMIT_ARGS="--master ${MASTER}"
 
+
+
