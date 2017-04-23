@@ -18,26 +18,33 @@ To use distkeras-docker, first git clone the repository and build docker file.
 
 ```
 git clone https://github.com/shibuiwilliam/distkeras-docker.git
-cd distkeras-docker
-docker build -t distkeras .
+# for spark master docker image
+cd distkeras-docker/distkeras_master
+docker build -t distkeras_master:1.0 .
+
+# for spark slave docker image
+cd distkeras-docker/distkeras_slave
+docker build -t distkeras_slave:1.0 .
 ```
 
-After the docker image is successfully built, run docker containers.
+You will get docker image for spark master and another one for spark worker.
+
+After the docker images are successfully built, run docker containers.
 Number of containers depend on how many Spark workers you need to add.
 The script below deploys one Spark master with worker container and two worker-only containers.
 
 ```
 # docker dist-keras for spark master and slave
 docker run -it -p 18080:8080 -p 17077:7077 -p 18888:8888 -p 18081:8081 -p 14040:4040 -p 17001:7001 -p 17002:7002 \
- -p 17003:7003 -p 17004:7004 -p 17005:7005 -p 17006:7006 --name spmaster -h spmaster distkeras /bin/bash
+ -p 17003:7003 -p 17004:7004 -p 17005:7005 -p 17006:7006 --name spmaster -h spmaster distkeras_master:1.0 /bin/bash
 
 # docker dist-keras for spark slave1
 docker run -it --link spmaster:master -p 28080:8080 -p 27077:7077 -p 28888:8888 -p 28081:8081 -p 24040:4040 -p 27001:7001 \
--p 27002:7002 -p 27003:7003 -p 27004:7004 -p 27005:7005 -p 27006:7006 --name spslave1 -h spslave1 distkeras /bin/bash
+-p 27002:7002 -p 27003:7003 -p 27004:7004 -p 27005:7005 -p 27006:7006 --name spslave1 -h spslave1 distkeras_slave:1.0 /bin/bash
 
 # docker dist-keras for spark slave2
 docker run -it --link spmaster:master -p 38080:8080 -p 37077:7077 -p 38888:8888 -p 38081:8081 -p 34040:4040 -p 37001:7001 \
--p 37002:7002 -p 37003:7003 -p 37004:7004 -p 37005:7005 -p 37006:7006 --name spslave2 -h spslave2 distkeras /bin/bash
+-p 37002:7002 -p 37003:7003 -p 37004:7004 -p 37005:7005 -p 37006:7006 --name spslave2 -h spslave2 distkeras_slave:1.0 /bin/bash
 ```
 
 On each container, run shellscripts, added during docker build, to start Spark cluster.
@@ -52,6 +59,18 @@ sh spark_master.sh
 # Spark worker starts and added to Spark cluster
 cd /opt/
 sh spark_slave.sh
+```
+
+#### Silent mode
+To run docker images silently, use this command.
+
+```
+docker run -it -p 18080:8080 -p 17077:7077 -p 18888:8888 -p 18081:8081 -p 14040:4040 -p 17001:7001 -p 17002:7002 \
+-p 17003:7003 -p 17004:7004 -p 17005:7005 -p 17006:7006 --name spm -h spm -d distkeras_master:1.0
+
+docker run -it --link spm:master -p 28080:8080 -p 27077:7077 -p 28888:8888 -p 28081:8081 -p 24040:4040 -p 27001:7001 \
+-p 27002:7002 -p 27003:7003 -p 27004:7004 -p 27005:7005 -p 27006:7006 --name sps1 -h sps1 -d distkeras_slave:1.0
+
 ```
 
 
@@ -231,11 +250,11 @@ Then add docker containers on test1 network.
 ```
 # for host1 as spark master
 docker run -it --net=test1 --ip=10.0.1.10 -p 18080:8080 -p 17077:7077 -p 18888:8888 -p 18081:8081 -p 14040:4040 -p 17001:7001 -p 17002:7002 \
--p 17003:7003 -p 17004:7004 -p 17005:7005 -p 17006:7006 --name spm -h spm distkeras /bin/bash
+-p 17003:7003 -p 17004:7004 -p 17005:7005 -p 17006:7006 --name spm -h spm distkeras_master:1.0 /bin/bash
 
 # for host2 as spark slave
 docker run -it --net=test1 --ip=10.0.1.20 --link=spm:master -p 28080:8080 -p 27077:7077 -p 28888:8888 -p 28081:8081 -p 24040:4040 -p 27001:7001 \
--p 27002:7002 -p 27003:7003 -p 27004:7004 -p 27005:7005 -p 27006:7006 --name sps1 -h sps1 distkeras /bin/bash
+-p 27002:7002 -p 27003:7003 -p 27004:7004 -p 27005:7005 -p 27006:7006 --name sps1 -h sps1 distkeras_slave:1.0 /bin/bash
 ```
 
 Now the docker containers are running on host1 and host2 with connection to test1 network.
