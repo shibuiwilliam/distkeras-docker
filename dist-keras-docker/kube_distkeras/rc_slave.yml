@@ -15,7 +15,7 @@ spec:
         type: slave
       containers:
         - name: distkeras-slave
-          image: distkeras_slave_kube:1.0
+          image: distkeras_slave_kube:1.3
           ports:
             - containerPort: 8888
             - containerPort: 7077

@@ -16,14 +16,22 @@ VOLUME [ "/sys/fs/cgroup" ]
 RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 RUN yum -y groupinstall "Development Tools"
 RUN yum -y install epel-release && \
-    yum -y install python-devel python-pip python-dev python-virtualenv && \
-    yum install -y wget bzip2 java-1.8.0-openjdk java-1.8.0-openjdk-devel tar unzip
+    yum -y install python-devel python-pip python-dev python-virtualenv git && \
+    yum -y install which wget bzip2 java-1.8.0-openjdk java-1.8.0-openjdk-devel tar unzip
+RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+RUN yum -y install python35u python35u-libs python35u-devel python35u-pip
 RUN yum -y update
 RUN yum clean all
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0
 
 
 # pip install python libraries
+RUN ln -s /usr/bin/python3.5 /usr/bin/python3
+RUN unlink /usr/bin/python
+RUN unlink /usr/bin/pip
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN ln -s /usr/bin/pip3.5 /usr/bin/pip
+
 RUN pip install --upgrade pip
 RUN pip install pandas scipy jupyter tensorflow keras && \
     pip install scikit-learn matplotlib Pillow && \
@@ -64,7 +72,6 @@ ENV SPARK_WORKER_WEBUI_PORT 8081
 
 # install dist-keras
 WORKDIR /opt/
-RUN yum -y install git
 RUN git clone https://github.com/JoeriHermans/dist-keras
 WORKDIR dist-keras
 RUN pip install -e .
