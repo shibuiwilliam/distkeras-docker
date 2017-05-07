@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: distkeras-master
+  name: distkeras-sv-master
+  namespace: default
+spec:
+  type: LoadBalancer
+  clusterIP: 192.168.10.10
+  ports: 
+    - port: 8888
+      name: jupyter
+      protocol: TCP
+      targetPort: 8888
+      nodePort: 30888
+    - port: 7077
+      name: spark
+      protocol: TCP
+      targetPort: 7077
+      nodePort: 30077
+    - port: 8080
+      name: spmaster
+      protocol: TCP
+      targetPort: 8080
+      nodePort: 30080
+    - port: 8081
+      name: spworker
+      protocol: TCP
+      targetPort: 8081
+      nodePort: 30081
+    - port: 4040
+      name: spui
+      protocol: TCP
+      targetPort: 4040
+      nodePort: 30040
+    - port: 7001
+      name: spdriv
+      protocol: TCP
+      targetPort: 7001
+      nodePort: 30001
+    - port: 7002
+      name: spfile
+      protocol: TCP
+      targetPort: 7002
+      nodePort: 30002
+    - port: 7003
+      name: spbroad
+      protocol: TCP
+      targetPort: 7003
+      nodePort: 30003
+    - port: 7004
+      name: sprepl
+      protocol: TCP
+      targetPort: 7004
+      nodePort: 30004
+    - port: 7005
+      name: spblock
+      protocol: TCP
+      targetPort: 7005
+      nodePort: 30005
+    - port: 7006
+      name: spexec
+      protocol: TCP
+      targetPort: 7006
+      nodePort: 30006
+  selector:
+    app: distkeras-master

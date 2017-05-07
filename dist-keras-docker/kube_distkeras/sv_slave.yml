@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: distkeras-slave
+  name: distkeras-sv-slave
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports: 
+    - port: 8888
+      name: jupyter
+      protocol: TCP
+      targetPort: 8888
+      nodePort: 31888
+    - port: 7077
+      name: spark
+      protocol: TCP
+      targetPort: 7077
+      nodePort: 31077
+    - port: 8080
+      name: spslave
+      protocol: TCP
+      targetPort: 8080
+      nodePort: 31080
+    - port: 8081
+      name: spworker
+      protocol: TCP
+      targetPort: 8081
+      nodePort: 31081
+    - port: 4040
+      name: spui
+      protocol: TCP
+      targetPort: 4040
+      nodePort: 31040
+    - port: 7001
+      name: spdriv
+      protocol: TCP
+      targetPort: 7001
+      nodePort: 31001
+    - port: 7002
+      name: spfile
+      protocol: TCP
+      targetPort: 7002
+      nodePort: 31002
+    - port: 7003
+      name: spbroad
+      protocol: TCP
+      targetPort: 7003
+      nodePort: 31003
+    - port: 7004
+      name: sprepl
+      protocol: TCP
+      targetPort: 7004
+      nodePort: 31004
+    - port: 7005
+      name: spblock
+      protocol: TCP
+      targetPort: 7005
+      nodePort: 31005
+    - port: 7006
+      name: spexec
+      protocol: TCP
+      targetPort: 7006
+      nodePort: 31006
+  selector:
+    app: distkeras-slave
