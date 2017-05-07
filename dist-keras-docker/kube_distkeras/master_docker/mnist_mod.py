@@ -38,12 +38,12 @@ import os
 application_name = "Distributed Keras MNIST Notebook"
 using_spark_2 = True
 local = True
-path_train = "data/mnist_train.csv"
-path_test = "data/mnist_test.csv"
+path_train = "/opt/dist-keras/examples/data/mnist_train.csv"
+path_test = "/opt/dist-keras/examples/data/mnist_test.csv"
 if local:
     # Tell master to use local resources.
 #     master = "local[*]"
-    master = "spark://192.16810.10:7077"
+    master = "spark://192.168.10.10:7077"
     num_processes = 1
     num_executors = 2
 else:
