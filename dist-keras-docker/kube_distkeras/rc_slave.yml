@@ -3,7 +3,7 @@ kind: ReplicationController
 metadata:
   name: distkeras-rc-slave
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     app: distkeras-slave
   template:
