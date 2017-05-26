@@ -17,7 +17,7 @@ RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
 RUN yum -y groupinstall "Development Tools"
 RUN yum -y install epel-release && \
     yum -y install python-devel python-pip python-dev python-virtualenv git && \
-    yum -y install which wget bzip2 java-1.8.0-openjdk java-1.8.0-openjdk-devel tar unzip
+    yum -y install which wget bzip2 java-1.8.0-openjdk java-1.8.0-openjdk-devel tar unzip zip
 RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
 RUN yum -y install python35u python35u-libs python35u-devel python35u-pip
 RUN yum -y update
@@ -89,5 +89,7 @@ WORKDIR /opt/
 COPY spark_master_kube.sh /opt/spark_master_kube.sh
 COPY spark_slave_kube.sh /opt/spark_slave_kube.sh
 COPY mnist_mod.py /opt/dist-keras/examples/mnist_mod.py
+COPY mnist_mod.ipynb /opt/dist-keras/examples/mnist_mod.ipynb
+
 
 CMD ["/opt/spark_master_kube.sh"]
