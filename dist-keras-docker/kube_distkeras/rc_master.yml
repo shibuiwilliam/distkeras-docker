@@ -15,7 +15,7 @@ spec:
         type: master
       containers:
         - name: distkeras-master
-          image: distkeras_master_kube:1.3
+          image: distkeras_master_kube:1.4
           ports:
             - containerPort: 8888
             - containerPort: 7077
